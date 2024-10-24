@@ -26,11 +26,14 @@ namespace BISoft.MiPrimeraApp.Aplicacion.Servicios
         //public Alumno CrearAlumno(string nombre, string apellido, string email)
         public AlumnoDto CrearAlumno(string nombre, string apellido, string email)
         {
-            //var existeAlumno = _repo.Obtener().Any(x => x.Email == email);
-            //if (existeAlumno)
-            //{
-            //    throw new Exception("El alumno ya existe");
-            //}
+           
+            //Alumno alumno;
+            var alumnoConsultado = _repo.Obtener().FirstOrDefault(alumno=>alumno.Nombre == nombre);
+            
+            if (alumnoConsultado is not null)
+            {
+                throw new InvalidOperationException("El alumno ya existe");  
+            }
 
             var alumno = new Alumno(nombre, apellido, email);
             _repo.Guardar(alumno);

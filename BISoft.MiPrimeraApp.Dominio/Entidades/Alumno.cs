@@ -19,6 +19,7 @@ namespace MyPrimeraApp.Entidades
             Apellido = apellido;
             Edad = 12;//Regla de negocio
 
+
           
             //usar regex para validar email
             if(string.IsNullOrEmpty(email) && !email.Contains("@"))
@@ -28,6 +29,8 @@ namespace MyPrimeraApp.Entidades
 
             Email = email;
         }
+
+
         public Alumno()
         {
             

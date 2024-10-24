@@ -1,4 +1,5 @@
 using BISoft.MiPrimeraApp.Aplicacion.Fabrica;
+using BISoft.MiPrimeraApp.Aplicacion.Helpers;
 using BISoft.MiPrimeraApp.Aplicacion.Request;
 using BISoft.MiPrimeraApp.Aplicacion.Response;
 using BISoft.MiPrimeraApp.Aplicacion.Servicios;
@@ -16,11 +17,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configurar el contexto de la base de datos
 builder.Services.AddDbContext<Context>(options =>
-    options.UseSqlServer("server=.;database = Escuela;Encrypt=false; Trusted_connection=true")
+    options.UseSqlServer("server=.\\SQLExpress;database = Escuela;Encrypt=false; Trusted_connection=true")
+);
+
+builder.Services.AddDbContext<SecurityCtx>(options =>
+    options.UseSqlServer("server=.\\SQLExpress;database = Escuela;Encrypt=false; Trusted_connection=true")
 );
 
 builder.Services.AddScoped<AlumnoService>();
 builder.Services.AddScoped<IAlumnoRepository, AlumnoRepository>();
+
+builder.Services.AddScoped<MaestroService>();
+builder.Services.AddScoped<IMaestroRepository, MaestroRepository>();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -53,15 +62,19 @@ app.MapGet("/api/alumnos", (AlumnoService service) =>
     return alumnos;
 });
 
-app.MapPost("/api/alumnos", (AlumnoService service, CrearAlumno alumnoDto) =>
+app.MapPost("/api/alumnos", (AlumnoService service,ILogger<AlumnoService> logger, CrearAlumno alumnoDto) =>
 {
+    logger.LogInformation("Crear el alumno {nombre}",alumnoDto.Nombre);
     var alumno = service.CrearAlumno(alumnoDto.Nombre, alumnoDto.Apellido, alumnoDto.Email);
+
+    var result = alumno.ToEntity();
+
     return alumno;
 });
 
-app.MapGet("/api/Maestros", () => {
+app.MapGet("/api/Maestros", (MaestroService service) => {
 
-    var service = ServiceFactory.CrearMaestroService();
+    //var service = ServiceFactory.CrearMaestroService();
     var alumnos = service.ObtenerMaestro();
     return alumnos;
 });
