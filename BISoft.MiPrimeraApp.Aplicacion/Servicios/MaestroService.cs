@@ -1,4 +1,5 @@
-﻿using MyPrimeraApp.Entidades;
+﻿using BISoft.MiPrimeraApp.Aplicacion.Response;
+using MyPrimeraApp.Entidades;
 using MyPrimeraApp.Repositorio;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,7 @@ namespace BISoft.MiPrimeraApp.Aplicacion.Servicios
             var maestro = new Maestro(nombre,apellido, email, direccion,telefono);
             _repo.Guardar(maestro);
 
+
             return maestro;
 
         }
@@ -36,5 +38,20 @@ namespace BISoft.MiPrimeraApp.Aplicacion.Servicios
         {
             return _repo.Obtener();
         }
+
+        private MaestroDto ConvertToMaestroDto(Maestro maestro)
+        {
+            return new MaestroDto(maestro.Nombre, maestro.Apellido, maestro.Email, maestro.Direccion, maestro.Telefono);
+        }
+
+        public Maestro ObtenerMaestroPorId(int id)
+        {
+            return _repo.Obtener().FirstOrDefault(x => x.Id == id);
+        }
+
+       
+
     }
+
 }
+

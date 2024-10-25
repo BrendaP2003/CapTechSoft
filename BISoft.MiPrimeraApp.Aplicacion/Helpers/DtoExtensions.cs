@@ -14,5 +14,10 @@ namespace BISoft.MiPrimeraApp.Aplicacion.Helpers
         {
             return new Alumno(alumnoDto.Nombre, alumnoDto.Apellido, $"{alumnoDto.Nombre}.{alumnoDto.Apellido}@gmail.com");
         }
+
+        public static Maestro ToEntity(this MaestroDto maestroDto)
+        {
+            return new Maestro(maestroDto.Nombre, maestroDto.Apellido, $"{maestroDto.Nombre}.{maestroDto.Apellido}@gmail.com", maestroDto.Direccion, maestroDto.Telefono);
+        }
     }
 }

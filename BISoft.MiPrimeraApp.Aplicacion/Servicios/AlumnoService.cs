@@ -57,6 +57,11 @@ namespace BISoft.MiPrimeraApp.Aplicacion.Servicios
         {
             return new AlumnoDto(alumno.Id, alumno.Nombre, alumno.Apellido, alumno.Edad);
         }
+
+        public Alumno ObtenerAlumnoPorId(int id)
+        {
+            return _repo.Obtener().FirstOrDefault(x => x.Id == id);
+        }
     }
     //public List<Alumno> ObtenerAlumnos()
     //    {

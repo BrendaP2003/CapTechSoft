@@ -20,9 +20,9 @@ builder.Services.AddDbContext<Context>(options =>
     options.UseSqlServer("server=.\\SQLExpress;database = Escuela;Encrypt=false; Trusted_connection=true")
 );
 
-builder.Services.AddDbContext<SecurityCtx>(options =>
-    options.UseSqlServer("server=.\\SQLExpress;database = Escuela;Encrypt=false; Trusted_connection=true")
-);
+//builder.Services.AddDbContext<SecurityCtx>(options =>
+//    options.UseSqlServer("server=.\\SQLExpress;database = Escuela;Encrypt=false; Trusted_connection=true")
+//);
 
 builder.Services.AddScoped<AlumnoService>();
 builder.Services.AddScoped<IAlumnoRepository, AlumnoRepository>();
@@ -45,21 +45,19 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-
-
-//app.MapGet("/api/Alumnos/{id}", (int id) => {
-
-//    //var service = ServiceFactory.CrearAlumnoService();
-//    var alumnos = service.ObtenerAlumnos();
-//    return alumnos;
-//});
-
+//Obtiene los Alumnos
 app.MapGet("/api/alumnos", (AlumnoService service) =>
 {
    // var service = ServiceFactory.CrearAlumnoService();
     var alumnos = service.ObtenerAlumnos();
     return alumnos;
+});
+//Obtiene los Maestros
+app.MapGet("/api/Maestros", (MaestroService service) => {
+
+    //var service = ServiceFactory.CrearMaestroService();
+    var maestros = service.ObtenerMaestro();
+    return maestros;
 });
 
 app.MapPost("/api/alumnos", (AlumnoService service,ILogger<AlumnoService> logger, CrearAlumno alumnoDto) =>
@@ -72,30 +70,61 @@ app.MapPost("/api/alumnos", (AlumnoService service,ILogger<AlumnoService> logger
     return alumno;
 });
 
-app.MapGet("/api/Maestros", (MaestroService service) => {
 
-    //var service = ServiceFactory.CrearMaestroService();
-    var alumnos = service.ObtenerMaestro();
-    return alumnos;
+
+
+app.MapPost("/api/Maestros", (MaestroService service, ILogger<MaestroService> logger, CrearMaestro maestroDto) =>
+{
+    logger.LogInformation("Crear el Maestro {nombre}", maestroDto.Nombre);
+    var maestro  = service.CrearMaestro(maestroDto.Nombre, maestroDto.Apellido, maestroDto.Email, maestroDto.Direccion, maestroDto.Telefono);
+
+    var result = maestro.ToDto();
+
+    return maestro;
 });
+
 
 //app.MapPost("/api/Alumnos", (Alumno alumno) => {
 
 //    var service = ServiceFactory.CrearAlumnoService();
 //    var resultado = service.CrearAlumno(alumno.Nombre, alumno.Apellido, alumno.Email);
 
-    
+
 //    return  resultado;
 //});
 
-app.MapPost("/api/Maestros/", (Maestro maestro) => {
-
-    var service = ServiceFactory.CrearMaestroService();
-    var resultado = service.CrearMaestro(maestro.Nombre, maestro.Apellido, maestro.Direccion,maestro.Email, maestro.Telefono);
-
+app.MapGet("/api/Alumnos/{Id}", (AlumnoService service, int id) =>
+{
+    var alumn = service.ObtenerAlumnoPorId(id);
+    if (alumn == null)
+    {
+        return Results.NotFound("El alumno no se encontro");
+    }
+    return Results.Ok(alumn);
     
-    return resultado;
 });
+
+app.MapGet("/api/Maestros/{Id}", (MaestroService service, int id) =>
+{
+    var teacher = service.ObtenerMaestroPorId(id);
+    if (teacher == null)
+    {
+        return Results.NotFound("El Maestro no se encontro");
+    }
+    return Results.Ok(teacher);
+    
+});
+
+
+//app.MapPost("/api/Maestros/", (Maestro maestro) =>
+//{
+
+//    var service = ServiceFactory.CrearMaestroService();
+//var resultado = service.CrearMaestro(maestro.Nombre, maestro.Apellido, maestro.Direccion, maestro.Email, maestro.Telefono);
+
+
+//return resultado;
+//});
 
 
 

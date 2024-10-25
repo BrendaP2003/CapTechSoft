@@ -15,5 +15,10 @@ namespace BISoft.MiPrimeraApp.Aplicacion.Helpers
         {
             return new AlumnoDto(alumno.Id, alumno.Nombre, alumno.Apellido, alumno.Edad);
         }
+
+        public static MaestroDto ToDto(this Maestro maestro )
+        {
+            return new MaestroDto(maestro.Nombre, maestro.Apellido, maestro.Direccion, maestro.Email, maestro.Telefono);
+        }
     }
 }
