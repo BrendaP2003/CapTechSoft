@@ -7,17 +7,32 @@ using Microsoft.EntityFrameworkCore;
 using MyPrimeraApp.Contextos;
 using MyPrimeraApp.Entidades;
 using MyPrimeraApp.Repositorio;
+using Serilog;
+using Serilog.Sinks.MSSqlServer;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString = "server=.\\SQLExpress;database = Escuela;Encrypt=false; Trusted_connection=true";
 // Add services to the container.
 
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    //.WriteTo.Console() // Ahora debería reconocer el método Console()
+    .WriteTo.MSSqlServer(
+        connectionString : connectionString,
+        sinkOptions: new MSSqlServerSinkOptions
+        {
+            TableName = "LogEvents",
+            AutoCreateSqlTable = true
+        })
+    .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+    .CreateLogger();
 
-
+//builder.Host.UseSerilog();
 // Configurar el contexto de la base de datos
 builder.Services.AddDbContext<Context>(options =>
-    options.UseSqlServer("server=.\\SQLExpress;database = Escuela;Encrypt=false; Trusted_connection=true")
+    options.UseSqlServer(connectionString)
 );
 
 //builder.Services.AddDbContext<SecurityCtx>(options =>
@@ -48,7 +63,8 @@ app.UseHttpsRedirection();
 //Obtiene los Alumnos
 app.MapGet("/api/alumnos", (AlumnoService service) =>
 {
-   // var service = ServiceFactory.CrearAlumnoService();
+    // var service = ServiceFactory.CrearAlumnoService();
+    //Logger.LogInformation("Obteniendo todos los alumnos");
     var alumnos = service.ObtenerAlumnos();
     return alumnos;
 });
