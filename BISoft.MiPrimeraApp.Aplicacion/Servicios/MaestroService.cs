@@ -39,7 +39,7 @@ namespace BISoft.MiPrimeraApp.Aplicacion.Servicios
             return _repo.Obtener();
         }
 
-        private MaestroDto ConvertToMaestroDto(Maestro maestro)
+         private MaestroDto ConvertToMaestroDto(Maestro maestro)
         {
             return new MaestroDto(maestro.Nombre, maestro.Apellido, maestro.Email, maestro.Direccion, maestro.Telefono);
         }

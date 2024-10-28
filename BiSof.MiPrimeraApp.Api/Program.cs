@@ -3,13 +3,14 @@ using BISoft.MiPrimeraApp.Aplicacion.Helpers;
 using BISoft.MiPrimeraApp.Aplicacion.Request;
 using BISoft.MiPrimeraApp.Aplicacion.Response;
 using BISoft.MiPrimeraApp.Aplicacion.Servicios;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using MyPrimeraApp.Contextos;
 using MyPrimeraApp.Entidades;
 using MyPrimeraApp.Repositorio;
 using Serilog;
 using Serilog.Sinks.MSSqlServer;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,14 +77,33 @@ app.MapGet("/api/Maestros", (MaestroService service) => {
     return maestros;
 });
 
-app.MapPost("/api/alumnos", (AlumnoService service,ILogger<AlumnoService> logger, CrearAlumno alumnoDto) =>
+app.MapPost("/api/alumnos", (AlumnoService service,ILogger<AlumnoService> logger,[FromBody] CrearAlumno alumnoDto) => 
 {
-    logger.LogInformation("Crear el alumno {nombre}",alumnoDto.Nombre);
-    var alumno = service.CrearAlumno(alumnoDto.Nombre, alumnoDto.Apellido, alumnoDto.Email);
+    try
+    {
+        logger.LogInformation("Crear el alumno {nombre}", alumnoDto.Nombre);
+        var alumno = service.CrearAlumno(alumnoDto.Nombre, alumnoDto.Apellido, alumnoDto.Email);
 
-    var result = alumno.ToEntity();
+        var result = alumno.ToEntity();
 
-    return alumno;
+        return Results.Ok(alumno);
+    } catch(InvalidOperationException e)
+    {
+
+        logger.LogError(e.Message);
+       return Results.BadRequest(e.Message);
+
+    } catch (SqlException e)
+    {
+        logger.LogError(e.Message);
+       return Results.Conflict("Conflicto en Repositorio");
+
+    } catch (Exception e)
+    {
+        logger.LogError(e.Message);
+       return Results.StatusCode(500);
+    }
+
 });
 
 
@@ -122,12 +142,12 @@ app.MapGet("/api/Alumnos/{Id}", (AlumnoService service, int id) =>
 
 app.MapGet("/api/Maestros/{Id}", (MaestroService service, int id) =>
 {
-    var teacher = service.ObtenerMaestroPorId(id);
-    if (teacher == null)
+    var maestro = service.ObtenerMaestroPorId(id);
+    if (maestro == null)
     {
         return Results.NotFound("El Maestro no se encontro");
     }
-    return Results.Ok(teacher);
+    return Results.Ok(maestro);
     
 });
 
